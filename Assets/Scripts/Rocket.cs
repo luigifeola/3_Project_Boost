@@ -7,8 +7,18 @@ public class Rocket : MonoBehaviour
     [SerializeField] float rcsThrust = 100f;
     [SerializeField] float thrust = 10f;
 
+    [SerializeField] ParticleSystem mainParticles;
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem deathParticles;
+
     Rigidbody rigidbody;
     AudioSource audioData;
+
+    enum State { Alive, Transcending, Dying}
+    State state = State.Alive;
+
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -20,23 +30,32 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Thrust();
-        Rotate();
+        if(state == State.Alive)
+        {
+            Thrust();
+            Rotate();
+        }
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        if (state != State.Alive) { return; }
+
         switch (collision.gameObject.tag)
         {
             case "Friendly":
                 break;
             case "Finish":
                 print("Hit Finish");
-                SceneManager.LoadScene(1);
+                state = State.Transcending;
+                successParticles.Play();
+                Invoke("LoadNextLevel", 1f);
                 break;
             default:
                 print("Dead");
-                SceneManager.LoadScene(0);
+                state = State.Dying;
+                deathParticles.Play();
+                Invoke("LoadFirstLevel", 1f);
                 break; 
         }
     }
@@ -57,6 +76,19 @@ public class Rocket : MonoBehaviour
         rigidbody.freezeRotation = false;
     }
 
+    private void LoadNextLevel()
+    {
+        SceneManager.LoadScene(1);
+        state = State.Alive;
+    }
+
+    private void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);
+        state = State.Alive;
+    }
+
+
 
     private void Thrust()
     {
@@ -67,10 +99,12 @@ public class Rocket : MonoBehaviour
             {
                 audioData.Play();
             }
+            mainParticles.Play();
         }
         else
         {
             audioData.Stop();
+            mainParticles.Stop();
         }
     }
 }
