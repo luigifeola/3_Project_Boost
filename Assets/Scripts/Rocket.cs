@@ -5,7 +5,8 @@ public class Rocket : MonoBehaviour
 {
 
     [SerializeField] float rcsThrust = 100f;
-    [SerializeField] float thrust = 10f;
+    [SerializeField] float thrust = 100f;
+    [SerializeField] float levelLoadDelay = 2f;
 
     [SerializeField] ParticleSystem mainParticles;
     [SerializeField] ParticleSystem successParticles;
@@ -49,13 +50,13 @@ public class Rocket : MonoBehaviour
                 print("Hit Finish");
                 state = State.Transcending;
                 successParticles.Play();
-                Invoke("LoadNextLevel", 1f);
+                Invoke("LoadNextLevel", levelLoadDelay);
                 break;
             default:
                 print("Dead");
                 state = State.Dying;
                 deathParticles.Play();
-                Invoke("LoadFirstLevel", 1f);
+                Invoke("LoadFirstLevel", levelLoadDelay);
                 break; 
         }
     }
@@ -94,7 +95,7 @@ public class Rocket : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidbody.AddRelativeForce(Vector3.up * thrust);
+            rigidbody.AddRelativeForce(Vector3.up * thrust * Time.deltaTime);
             if (!audioData.isPlaying)
             {
                 audioData.Play();
