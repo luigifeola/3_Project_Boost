@@ -36,7 +36,10 @@ public class Rocket : MonoBehaviour
         {
             RespondToThrustInput();
             RespondToRotateInput();
-            DebugFunction();
+            if (Debug.isDebugBuild)
+            {
+                DebugKeys();
+            }
         }
     }
 
@@ -86,7 +89,19 @@ public class Rocket : MonoBehaviour
 
     private void LoadNextLevel()
     {
-        SceneManager.LoadScene(1); // todo allow for more than 2 levels
+        int totLevel = SceneManager.sceneCountInBuildSettings;
+        print("totLevel" + totLevel);
+        //print("scena attuale " + SceneManager.GetActiveScene().buildIndex);
+        int nextLevel = (SceneManager.GetActiveScene().buildIndex +1) % totLevel ;
+        //int nextLevel = 0;
+        print("nextLevel" + nextLevel);
+        SceneManager.LoadScene(nextLevel); 
+    }
+
+    private void LoadPreviousLevel()
+    {
+        int previoustLevel = SceneManager.GetActiveScene().buildIndex -1;
+        SceneManager.LoadScene(previoustLevel); 
     }
 
 
@@ -140,20 +155,25 @@ public class Rocket : MonoBehaviour
 
 
 
-    private void DebugFunction()
+    private void DebugKeys()
     {
         //if (!Input.GetKey(KeyCode.L) && !Input.GetKey(KeyCode.C)) { return; }
-        if (Input.GetKey(KeyCode.L)) // can thrust while rotating
+        if (Input.GetKey(KeyCode.L)) 
         {
             LoadNextLevel();
             print("DEBUG NEXT LEVEL");
         }
-        if (Input.GetKey(KeyCode.K)) // can thrust while rotating
+        else if(Input.GetKey(KeyCode.K))
+        {
+            LoadPreviousLevel();
+            print("DEBUG FIRST LEVEL");
+        }
+        else if (Input.GetKey(KeyCode.J))
         {
             LoadFirstLevel();
-            print("DEBUG PREVIOUS LEVEL");
+            print("DEBUG FIRST LEVEL");
         }
-        if (Input.GetKey(KeyCode.C))
+        else if(Input.GetKey(KeyCode.C))
         {
             debugcollision = true;
             print("DEBUG COLLISION DISABLED");
