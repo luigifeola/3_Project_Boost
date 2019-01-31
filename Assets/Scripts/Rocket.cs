@@ -19,7 +19,7 @@ public class Rocket : MonoBehaviour
 
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
-
+    static bool debugcollision = false;
 
 
     // Use this for initialization
@@ -36,6 +36,7 @@ public class Rocket : MonoBehaviour
         {
             RespondToThrustInput();
             RespondToRotateInput();
+            DebugFunction();
         }
     }
 
@@ -54,7 +55,10 @@ public class Rocket : MonoBehaviour
                 StartSuccessSequence();
                 break;
             default:
-                StartDeathSequence();
+                if (!debugcollision)
+                { 
+                    StartDeathSequence();
+                }
                 break;
         }
     }
@@ -132,5 +136,32 @@ public class Rocket : MonoBehaviour
         }
 
         rigidBody.freezeRotation = false; // resume physics control of rotation
+    }
+
+
+
+    private void DebugFunction()
+    {
+        //if (!Input.GetKey(KeyCode.L) && !Input.GetKey(KeyCode.C)) { return; }
+        if (Input.GetKey(KeyCode.L)) // can thrust while rotating
+        {
+            LoadNextLevel();
+            print("DEBUG NEXT LEVEL");
+        }
+        if (Input.GetKey(KeyCode.K)) // can thrust while rotating
+        {
+            LoadFirstLevel();
+            print("DEBUG PREVIOUS LEVEL");
+        }
+        if (Input.GetKey(KeyCode.C))
+        {
+            debugcollision = true;
+            print("DEBUG COLLISION DISABLED");
+        }
+        else if (Input.GetKey(KeyCode.V))
+        {
+            debugcollision = false;
+            print("DEBUG COLLISION ENABLED");
+        }
     }
 }
